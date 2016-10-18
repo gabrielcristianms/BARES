@@ -2,7 +2,9 @@ Anotações para o BARES:
 
 Classe Symbol
 Notação pós-fixa
-parsing
+parsing e validação da expressão
 Fila de symbols
 conversão de notação
+empilhar operadores para conversão
 tratamento de erro
+Empilhar operandos, enfileirar operadores( ter uma fila de symbols garante isso? )

@@ -128,7 +128,7 @@ std::string infix_to_postfix( std::string infix ){
 }
 
 int char_2_int( char ch ){
-	return '0' - ch;
+	return ch - '0';
 }
 
 int apply_operation( int op1, int op2, char ch ){
@@ -149,7 +149,7 @@ int evaluate_postfix( std::string postfix ){
 
 	for( auto ch : postfix ){
 		if( is_operand( ch ) ){
-			S.push( ch );
+			S.push( char_2_int( ch ) );
 		}
 		else if ( is_operator( ch ) ){
 			auto op2 = S.top(); S.pop();

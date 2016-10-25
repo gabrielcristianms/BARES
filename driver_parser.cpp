@@ -73,8 +73,8 @@ void print_msg( const Parser::ParserResult & result, std::string str )
 
 int main()
 {
-
-    Parser my_parser;
+    Parser my_parser; // Instancia um parser.
+    // Tentar analisar cada expressão da lista.
     for( const auto & expr : expressions )
     {
         // Fazer o parsing desta expressão.

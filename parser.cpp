@@ -12,11 +12,23 @@ Parser::parse( std::string e_ )
 }
 
 
-/*! 
+/*!
  *  \brief Verifica se o caractere atual (curr_symb) corresponde ao código esperado.
- *  Porém, o método **não consome** ou caractere, ou seja, o iterador `curr_symb` não avança.
- *  \param c_ O código (enum) do símbolo que desejamos verificar se é o símbolo atual da expressão.
- *  \return True se o símbolo informado é o símbolo atual da expressão, False caso contrário.
+ *
+ *  Porém, o método **não consome** o caractere, ou seja, o iterador `curr_symb` não avança.
+ *  Basicamente este método funciona como uma tabela:
+ *
+ *  ----------+-------
+ *  Caractere | Código
+ *  ----------+-------
+ *  "("       |  0
+ *  ")"       |  1
+ *  "+"       |  2
+ *  "-"       |  3
+ *  ...
+ *
+ *  \param c_ O caractere do símbolo que desejamos converter para o código (enum) do símbolo.
+ *  \return O código (enum) do caractere indicado por parâmetro.
  */
 Parser::terminal_symbol_t  Parser::lexer( char c_ ) const
 {

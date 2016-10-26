@@ -45,16 +45,6 @@ And _rejectes_ expressions like:
 
 Later on we might want to improve this grammar to accept _subtracion_ and _parenthesis_.
 
-# Log
-
-* Oct-25th:
-    - Created class [`Parser`](parser.h), to parse an expression.
-    - Created class [`ParserResult`](parser.h) (inner class of [`Parser`](parser.h)), to represent the result of a parsing operation.
-    - Created a simple driver that tries to parse a series of expressions.
-    - Created basic processing methods for the class [`Parser`](parser.cpp).
-* Oct-27th:
-    - (see [TODO](#todo))
-
 # TODO
 
 - [X] Explain the concepts behind the parsing process.

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 * Oct-25th:
     - Created class [`Parser`](parser.h), to parse an expression.
-    - Created class [`ParserResult`](parser.h) (inner class of [`Parser`](parser.h)), to represe>
+    - Created class [`ParserResult`](parser.h) (inner struct of [`Parser`](parser.h)), to receive the error code and location, or the success code.
     - Created a simple driver that tries to parse a series of expressions.
     - Created basic processing methods for the class [`Parser`](parser.cpp).
 * Oct-27th:

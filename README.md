@@ -32,7 +32,7 @@ This grammar _accepts_ expressions like:
 * " 21"
 * "-21 +     -18"
 
-And _rejectes_ expressions like:
+And _rejects_ expressions like:
 
 * "01 + 3"
 * " - 3 + 4"

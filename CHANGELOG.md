@@ -11,3 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Created class [`ParserResult`](parser.h) (inner class of [`Parser`](parser.h)), to represe>
     - Created a simple driver that tries to parse a series of expressions.
     - Created basic processing methods for the class [`Parser`](parser.cpp).
+* Oct-27th:
+    - Non-terminal methods implemented:
+        - expression()
+        - term()
+        - integer()
+        - natural_number()
+    - Tested parser with several examples
+    - Create the struct [`Token`](token.h) to represent a Bares' token. The objective is to create a list of tokens during the parsing process. In turn, this list shall be the input of the [infix-to-postfix algorithm](http://projetos.imd.ufrn.br/LP1_20162/bares).

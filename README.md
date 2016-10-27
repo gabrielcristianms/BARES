@@ -49,6 +49,6 @@ Later on we might want to improve this grammar to accept _subtracion_ and _paren
 
 - [X] Explain the concepts behind the parsing process.
 - [X] Implement `Parser` class and its basic infrastructure for processing symbols.
-- [ ] Implement the non-terminal production rules.
-- [ ] Test the parsing process.
+- [X] Implement the non-terminal production rules.
+- [X] Test the parsing process.
 - [ ] Improve parsing to generate, as a result, a list (`std::vector`) of tokens.

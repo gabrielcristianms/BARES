@@ -1,14 +1,50 @@
 #include "parser.h"
 
+/*!
+ * Este é o **ponto de entrada**.
+ * A partir daqui o parser tenta aceitar os símbolos não-terminais da
+ * gramática, de maneira recursiva e descendente.
+ *
+ * \param e_ A string correspondente a uma expressão que o cliente quer analisar sintaticamente.
+ * \return O resultado do parsing.
+ */
 Parser::ParserResult 
 Parser::parse( std::string e_ )
 {
-    expr = e_; // Guarda expressão passada.
-    curr_symb = expr.begin(); // Caractere inicial.
+    // Os 4 comandos abaixo são executados a cada nova string a ser analisada.
+    expr = e_;  // Guarda expressão passada.
+    curr_symb = expr.begin(); // Iterador aponta p/ 1o caractere da string.
+    curr_status = ParserResult( ParserResult::PARSER_OK ); // "Resetar" a msg de status p/ OK.
+    token_list.clear(); // Limpar a lista de tokens para a próxima expressão.
 
-    //expression();
+    // Verificar se a string acabou sem conter uma expressão.
+    skip_ws();
+    if ( end_input() )
+    {
+        // Recebemos uma string vazia.
+        curr_status = ParserResult( ParserResult::UNEXPECTED_END_OF_EXPRESSION,
+                                    std::distance( expr.begin(), curr_symb ) );
+    }
+    else
+    {
+        // Se chegou aqui, então estamos esperando uma expressão bem formada.
+        expression(); // Tenta aceitar uma expressão bem formada.
 
-    return curr_status; // Retorna o resultado do parsing.
+        // Se depois da expressão ter sido bem avaliada (sem erros), ainda existir algum
+        // caractere (que não seja ws), então existem símbolo(s) estranho(s)...
+        if ( curr_status.type == ParserResult::PARSER_OK )
+        {
+            // Saltamos qualquer espaço em branco remanescente da string.
+            skip_ws();
+            if ( not end_input() ) // Se não chegamos ao fim da string, é porque
+            {                      // tem símbolo não-esperado na string!
+                curr_status = ParserResult( ParserResult::EXTRANEOUS_SYMBOL,
+                        std::distance( expr.begin(), curr_symb ) );
+            }
+        }
+    }
+
+    return curr_status; // Retorna para o cliente o resultado do parsing.
 }
 
 
@@ -97,16 +133,18 @@ bool Parser::end_input( void ) const
  * O método deixa o iterador `curr_symb` apontando para o primeiro próximo
  * caractere da expressão que não seja ws (espaço em branco ou tab).
  *
- * \note 
+ * \note
  * O método pode fazer o ponteiro chegar ao fim da expressão, se ela possuir
  * apenas ws até o final.
+ *
  * \sa end_input(), accept(), next_symb().
  */
 void Parser::skip_ws( void )
 {
+    // Enquanto não esgotar a string e acharmos ws ou tab, vamos avançar...
     while( not end_input() and ( peek( TS_WS ) or peek( TS_TAB ) ) )
     {
-        next_symbol();
+        next_symbol(); // Avançar iterador 1 posição à frente.
     }
 }
 
@@ -123,7 +161,7 @@ bool Parser::accept( terminal_symbol_t s_ )
     // Tentando consumir (da expressão) o símbolo indicado (pelo processo de parsing).
     if ( not end_input() and peek( s_ ) )
     {
-        next_symbol();
+        next_symbol(); // Consome caractere (símbolo) da expressão-string.
         return true;
     }
     return false;
@@ -143,4 +181,105 @@ bool Parser::expect( terminal_symbol_t s_ )
     skip_ws();
     // (2) tentar aceitar o símbolo.
     return accept( s_ );
+}
+
+/*! \brief Parses a NTS <expression>.
+ *
+ *  This method parses part of the input expression looking for <expression>.
+ *
+ *  The production is:
+ *  ```
+ *  <expression> := <term>,{ "+",<term> };
+ *  ```
+ *  \sa parser(), term().
+ */
+void Parser::expression( void )
+{
+    term(); // Procura aceitar um <term> dentro da expressõ.
+    // Verificar se já não tem erro encontrado, ou seja, o <term> anterior foi mal-formado.
+    if ( curr_status.type != ParserResult::PARSER_OK )
+        return; // Não adiantar continuar processando, melhor voltar...
+
+    // Se chegou aqui, quer dizer que o primeiro termo está ok.
+    while ( expect( TS_PLUS ) or expect( TS_MINUS ) ) // devemos processar 0 ou mais <term>s
+    {
+        skip_ws();
+        if ( end_input() ) // Depois de saltar ws, não encontramos mais nada!! Erro!!
+        {
+            curr_status = ParserResult( ParserResult::MISSING_TERM,
+                                        std::distance( expr.begin(), curr_symb ) );
+        }
+        else
+        {
+            // Situação normal, esperamos aceitar um novo termo.
+            term();
+        }
+    }
+}
+
+/*! \brief Parses a NTS <term>.
+ *
+ *  This method parses part of the input expression looking for <term>.
+ *  The production is:
+ *  ```
+ *  <term> := <integer>;
+ *  ```
+ *  \sa expression(), integer().
+ */
+void Parser::term( void )
+{
+    integer();
+}
+
+/*! \brief Parses a NTS <integer>.
+ *
+ *  This method parses part of the input expression looking for <integer>.
+ *
+ *  The production is:
+ *  <interget> := ["-"],<natural_number> | "0";
+ *
+ *
+ *  \sa natural_number()
+ */
+void Parser::integer( void )
+{
+    // Podemos receber um zero...
+    if ( expect(TS_ZERO) )
+    {
+        return;
+    }
+    else  //... ou então um ["-"],<natural_number>
+    {
+        accept( TS_MINUS ); // Pode ser que venha um '-'.
+        natural_number();   // Aqui tentamos aceitar um <número_naural>.
+    }
+}
+
+/*! \brief Parses o símbolo não-terminal <natural_number>.
+ *
+ *  This method parses part of the input expression looking for <natural_number>.
+ *
+ *  The production is:
+ *  ```
+ *  <natural_number> := <digit_excl_zero>,{<digit>};
+ *  ```
+ *  \sa integer()
+ */
+void Parser::natural_number( void )
+{
+    // Tentando aceitar <digit_excl_zero>,
+    if ( accept( TS_NON_ZERO_DIGIT ) )
+    {
+        // ... que pode ser seguido de 0 ou mais <digit>s.
+        while( accept( TS_NON_ZERO_DIGIT ) or accept( TS_ZERO ) ) 
+        {
+            /* empty */ ; // Nada a fazer, apenas "consumir" (avançar) o símbolo da string.
+        }
+    }
+    else
+    {
+        // Opa, veio "algo" que não é um 'dígito_diferente_de_zero'!
+        curr_status = ParserResult( ParserResult::ILL_FORMED_INTEGER,
+                                    std::distance( expr.begin(), curr_symb ) );
+    }
 }

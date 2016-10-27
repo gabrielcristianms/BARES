@@ -1,4 +1,12 @@
-#include <iostream>
+#ifndef _PARSER_H_
+#define _PARSER_H_
+
+#include <iostream> // cout, cin
+#include <iterator> // std::distance()
+#include <vector>   // std::vector
+
+#include "token.h"
+
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.
  *
@@ -17,33 +25,31 @@ class Parser
          *  Por ser uma classe muito simples, vamos deixar seus campos públicos,
          *  para evitar o _overhead_ de chamar métodos _getter_ e _setter_.
          */
-        class ParserResult
+        struct ParserResult
         {
-            private:
-                typedef size_t size_type; //<! Tipo de dado representando a posição (coluna) do erro dentro da expressão.
+            typedef size_t size_type; //<! Tipo de dado representando a posição (coluna) do erro dentro da expressão.
 
-            public:
-                /*! Aqui é uma simple tabela de erros. */
-                enum code_t {
+            /*! Aqui é uma simple tabela de erros. */
+            enum code_t {
                     PARSER_OK = 0,
                     UNEXPECTED_END_OF_EXPRESSION,
                     ILL_FORMED_INTEGER,
                     MISSING_TERM,
                     EXTRANEOUS_SYMBOL,
                     MISSING_CLOSING_PARENTHESIS,
-                    INTEGER_OUT_OF_RANGE,
-                    N_CODES   // Indicates the # of codes.
-                };
+                    INTEGER_OUT_OF_RANGE
+            };
 
-                // Membros públicos da classe. Não precisamos de métodos.
-                code_t type; //<! Guarda o tipo de erro.
-                size_type at_col; //<! Guarda a coluna do erro.
+            // Membros públicos da classe.
+            // Portanto, não precisamos de métodos para acessá-los.
+            code_t type;      //<! Guarda o tipo de erro.
+            size_type at_col; //<! Guarda a coluna do erro.
 
-                // Por padrão, o resultado é positivo.
-                explicit ParserResult( code_t type_=PARSER_OK , size_type col_=0u )
+            // Por padrão, o resultado é positivo.
+            explicit ParserResult( code_t type_=PARSER_OK , size_type col_=0u )
                     : type{ type_ }
                     , at_col{ col_ }
-                { /* empty */ }
+            { /* empty */ }
         };
 
         /// Recebe uma expressão, realiza o parsing e retorna o resultado.
@@ -57,7 +63,6 @@ class Parser
         Parser & operator=( const Parser & ) = delete; // Atribuição.
 
     private:
-
         // Tabela de símbolos terminais.
         // Cada símbolo (caractere terminal) está associado a um código.
         enum terminal_symbol_t{  // The symbols:-
@@ -69,16 +74,16 @@ class Parser
             TS_NON_ZERO_DIGIT,  //<! "1"->"9"
             TS_WS,              //<! white-space
             TS_TAB,             //<! tab
-            TS_EOS,		//<! End-of-strin, or '\0'
-            TS_INVALID,	        //<! invalid token
-            //
-            N_SYMBOLS            //<! total of existing symbols.
+            TS_EOS,
+            TS_INVALID	        //<! invalid token
         };
 
         // Membros privados do parser.
         std::string expr;                //<! Expressão para ser avaliada.
         std::string::iterator curr_symb; //<! Posição atualmente processada dentro da expressão.
         ParserResult curr_status;        //<! Guarda o estado atual da operação de parsing.
+        std::vector< Token > token_list; //<! Lista de tokens que foram processados pelo parser.
+
 
         /// Converte de caractere para código do símbolo terminal.
         terminal_symbol_t lexer( char ) const;
@@ -92,5 +97,10 @@ class Parser
         bool end_input( void ) const; // Verifica se chegamos ao fim da expressão.
 
         // Aqui vem os métodos correspondentes às regras de produção da gramática.
-
+       void expression();
+       void term();
+       void integer();
+       void natural_number();
 };
+
+#endif

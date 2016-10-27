@@ -6,12 +6,13 @@
 
 std::vector<std::string> expressions =
 {
+    "12 + 3",
+    "-3+-5+-6",
+    "12 + 3     -3 + -34 ",
     "+12",
     " ( -   12  )",
     "( 120 - ( -2 ))",
     "5 + (-3 + 5(",
-    "-3+-5+-6",
-    "12 + 3",
     "12  3",
     "12  # 3",
     "12  + 3 - ( 534 + 48  ) + ( ( 500 - 10) + 4 ) - 1234",
@@ -58,9 +59,6 @@ void print_msg( const Parser::ParserResult & result, std::string str )
         case Parser::ParserResult::MISSING_CLOSING_PARENTHESIS:
             std::cout << ">>> Missing closing \")\" at column (" << result.at_col << ")!\n";
             break;
-        case Parser::ParserResult::PARSER_OK:
-            std::cout << ">>> Expression SUCCESSFULLY parsed!\n";
-            break;
         default:
             std::cout << ">>> Unhandled error found!\n";
             break;
@@ -87,7 +85,6 @@ int main()
             print_msg( result, expr );
         else
             std::cout << ">>> Expression SUCCESSFULLY parsed!\n";
-
     }
 
     std::cout << "\n>>> Normal exiting...\n";

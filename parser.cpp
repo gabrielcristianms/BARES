@@ -207,21 +207,26 @@ void Parser::expression( void )
     if ( curr_status.type != ParserResult::PARSER_OK )
         return; // Não adiantar continuar processando, melhor voltar...
 
-    // Copiar o token.
+    // ===============================================================================
+    // TOKENIZAÇÃO:
+    // Este código separa o token e o insere na lista de tokens
+    // -------------------------------------------------------------------------------
+    // Recebe a string do token.
     std::string token_value;
-    //std::copy( begin_token, curr_symb, token_value );
     std::copy( begin_token, curr_symb, std::back_inserter( token_value ) );
     // Testar se o valor está dentro dos limites aceitáveis de um inteiro curto.
     if( outside_range( token_value ) )
     {
+        // Gerar error de parser correspondente.
         curr_status = ParserResult( ParserResult::INTEGER_OUT_OF_RANGE,
                 std::distance( expr.begin(), begin_token ) );
     }
     else
     {
-        // Inserir o token na lista.
+        // Token Ok. Inserir o token na lista.
         token_list.emplace_back( Token( token_value, Token::OPERAND ) );
     }
+    // ===============================================================================
 
 
     // Se chegou aqui, quer dizer que o primeiro termo está ok.
@@ -229,12 +234,18 @@ void Parser::expression( void )
     while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) ) and
             curr_status.type == ParserResult::PARSER_OK )
     {
+        // ===============================================================================
+        // TOKENIZAÇÃO:
+        // Este código separa o token e o insere na lista de tokens
+        // -------------------------------------------------------------------------------
         // Salvar o token correspondente ao operador binário recém processado.
         std::advance( curr_symb, -1 ); // Voltei uma posição para apontar para o operador.
-        token_value.clear();
-        std::copy( curr_symb, curr_symb+1, 
+        token_value.clear(); // Limpar string para receber novo token.
+        std::copy( curr_symb, curr_symb+1, // Uma string de apenas 1 caractere.
                    std::back_inserter( token_value ) ); // Copiando o operador binário.
+        // Inserir token completo na lista de tokens.
         token_list.emplace_back( Token( token_value, Token::OPERATOR ) );
+        // ===============================================================================
 
         // Avançar novamente o curr_symb.
         std::advance( curr_symb, +1 );
@@ -251,8 +262,13 @@ void Parser::expression( void )
             begin_token = curr_symb;
             // Situação normal, esperamos aceitar um novo termo.
             term();
-            // Copiar o token para a lista.
-            token_value.clear();
+
+            // ===============================================================================
+            // TOKENIZAÇÃO:
+            // Este código separa o token e o insere na lista de tokens
+            // -------------------------------------------------------------------------------
+            token_value.clear(); // Limpar string para receber novo token.
+            // Copiar pedaço da expressão para a string temporária.
             std::copy( begin_token, curr_symb, std::back_inserter( token_value ) );
             // Testar se o valor está dentro dos limites aceitáveis de um inteiro curto.
             if( outside_range( token_value ) )
@@ -262,9 +278,10 @@ void Parser::expression( void )
             }
             else
             {
-                // Inserir o token na lista.
+                // Inserir o token bem formado na lista.
                 token_list.emplace_back( Token( token_value, Token::OPERAND ) );
             }
+            // ===============================================================================
         }
     }
 }

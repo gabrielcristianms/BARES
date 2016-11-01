@@ -8,7 +8,7 @@
  * \param e_ A string correspondente a uma expressão que o cliente quer analisar sintaticamente.
  * \return O resultado do parsing.
  */
-Parser::ParserResult 
+Parser::ParserResult
 Parser::parse( std::string e_ )
 {
     // Os 4 comandos abaixo são executados a cada nova string a ser analisada.
@@ -47,6 +47,11 @@ Parser::parse( std::string e_ )
     return curr_status; // Retorna para o cliente o resultado do parsing.
 }
 
+std::vector< Token >
+Parser::get_tokens( void ) const
+{
+    return token_list;
+}
 
 /*!
  *  \brief Verifica se o caractere atual (curr_symb) corresponde ao código esperado.
@@ -195,14 +200,45 @@ bool Parser::expect( terminal_symbol_t s_ )
  */
 void Parser::expression( void )
 {
+    auto begin_token = curr_symb;
+
     term(); // Procura aceitar um <term> dentro da expressõ.
     // Verificar se já não tem erro encontrado, ou seja, o <term> anterior foi mal-formado.
     if ( curr_status.type != ParserResult::PARSER_OK )
         return; // Não adiantar continuar processando, melhor voltar...
 
-    // Se chegou aqui, quer dizer que o primeiro termo está ok.
-    while ( expect( TS_PLUS ) or expect( TS_MINUS ) ) // devemos processar 0 ou mais <term>s
+    // Copiar o token.
+    std::string token_value;
+    //std::copy( begin_token, curr_symb, token_value );
+    std::copy( begin_token, curr_symb, std::back_inserter( token_value ) );
+    // Testar se o valor está dentro dos limites aceitáveis de um inteiro curto.
+    if( outside_range( token_value ) )
     {
+        curr_status = ParserResult( ParserResult::INTEGER_OUT_OF_RANGE,
+                std::distance( expr.begin(), begin_token ) );
+    }
+    else
+    {
+        // Inserir o token na lista.
+        token_list.emplace_back( Token( token_value, Token::OPERAND ) );
+    }
+
+
+    // Se chegou aqui, quer dizer que o primeiro termo está ok.
+    // devemos processar 0 ou mais <term>s
+    while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) ) and
+            curr_status.type == ParserResult::PARSER_OK )
+    {
+        // Salvar o token correspondente ao operador binário recém processado.
+        std::advance( curr_symb, -1 ); // Voltei uma posição para apontar para o operador.
+        token_value.clear();
+        std::copy( curr_symb, curr_symb+1, 
+                   std::back_inserter( token_value ) ); // Copiando o operador binário.
+        token_list.emplace_back( Token( token_value, Token::OPERATOR ) );
+
+        // Avançar novamente o curr_symb.
+        std::advance( curr_symb, +1 );
+
         skip_ws();
         if ( end_input() ) // Depois de saltar ws, não encontramos mais nada!! Erro!!
         {
@@ -211,8 +247,24 @@ void Parser::expression( void )
         }
         else
         {
+            // Iniciando um novo token.
+            begin_token = curr_symb;
             // Situação normal, esperamos aceitar um novo termo.
             term();
+            // Copiar o token para a lista.
+            token_value.clear();
+            std::copy( begin_token, curr_symb, std::back_inserter( token_value ) );
+            // Testar se o valor está dentro dos limites aceitáveis de um inteiro curto.
+            if( outside_range( token_value ) )
+            {
+                curr_status = ParserResult( ParserResult::INTEGER_OUT_OF_RANGE,
+                        std::distance( expr.begin(), begin_token ) );
+            }
+            else
+            {
+                // Inserir o token na lista.
+                token_list.emplace_back( Token( token_value, Token::OPERAND ) );
+            }
         }
     }
 }
@@ -283,3 +335,14 @@ void Parser::natural_number( void )
                                     std::distance( expr.begin(), curr_symb ) );
     }
 }
+
+
+bool Parser::outside_range( std::string val_ ) const
+{
+    short int value;
+    std::istringstream iss( val_ );
+
+    iss >> value;
+    return iss.fail();
+}
+

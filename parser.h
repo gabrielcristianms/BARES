@@ -4,8 +4,9 @@
 #include <iostream> // cout, cin
 #include <iterator> // std::distance()
 #include <vector>   // std::vector
+#include <sstream>  // std::istringstream
 
-#include "token.h"
+#include "token.h"  // struct Token.
 
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.
@@ -54,6 +55,8 @@ class Parser
 
         /// Recebe uma expressão, realiza o parsing e retorna o resultado.
         ParserResult parse( std::string e_ );
+        /// Retorna a lista de tokens.
+        std::vector< Token > get_tokens( void ) const;
 
         /// Constutor default.
         Parser() = default;
@@ -101,6 +104,9 @@ class Parser
        void term();
        void integer();
        void natural_number();
+
+       //
+       bool outside_range( std::string ) const;
 };
 
 #endif

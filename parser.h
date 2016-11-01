@@ -11,7 +11,7 @@
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.
  *
- *   <expr>            := <term>,{ "+",<term> };
+ *   <expr>            := <term>,{ ("+"|"-"),<term> };
  *   <term>            := <integer>;
  *   <integer>         := 0 | ["-"],<natural_number>;
  *   <natural_number>  := <digit_excl_zero>,{<digit>};

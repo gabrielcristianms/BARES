@@ -2,6 +2,7 @@
 #define _TOKEN_H_
 
 #include <string>
+#include <iostream>
 
 /// Estrutura que representa um token, composto por seu valor (string) e seu tipo (enum).
 struct Token
@@ -22,6 +23,16 @@ struct Token
             : value( v_ )
             , type( t_ )
         {/* empty */}
+
+        friend std::ostream & operator<<( std::ostream& os_, const Token & t_ )
+        {
+            std::string types[] = { "OPERAND", "OPERATOR", "SCOPE" };
+
+            os_ << "<" << t_.value << "," << types[t_.type] << ">";
+
+            return os_;
+        }
+
 };
 
 #endif

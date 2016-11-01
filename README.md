@@ -9,17 +9,11 @@ Information on **EBNF grammar** may be found [here](https://en.wikipedia.org/wik
 
 Information on **recursive descendent parsing** may be found [here](https://en.wikipedia.org/wiki/Recursive_descent_parser).
 
-# Authorship
-
-Program developed by Selan (<selan@dimap.ufrn.br>) and students from LP1, 2016.2
-
-&copy; DIMAp/UFRN 2016.
-
 # The Grammar
 
-The gramar we want to parse is for arithmetic expressions representing simple addition of integers.
+The gramar we want to parse represents arithmetic expressions with addition and subtraction of integers.
 
-    <expr>            := <term>,{ "+",<term> };
+    <expr>            := <term>,{ ("+"|"-"),<term> };
     <term>            := <integer>;
     <integer>         := 0 | ["-"],<natural_number>;
     <natural_number>  := <digit_excl_zero>,{<digit>};
@@ -28,9 +22,11 @@ The gramar we want to parse is for arithmetic expressions representing simple ad
 
 This grammar _accepts_ expressions like:
 
-* "23 + 43 + 0   + -124 + 21"
+* "23 + 43 - 0   + -124 - 21"
 * " 21"
 * "-21 +     -18"
+* " -54"
+* "-21 - 23 + 1234"
 
 And _rejects_ expressions like:
 
@@ -41,9 +37,8 @@ And _rejects_ expressions like:
 * "+2 + 5"
 * "-02 + 4"
 * "(2+3)" _(for the time being)_
-* "2 - 3" _(for the time being)_
 
-Later on we might want to improve this grammar to accept _subtracion_ and _parenthesis_.
+Later on we might want to improve this grammar to accept other binary operations and _parenthesis_.
 
 # TODO
 
@@ -51,4 +46,12 @@ Later on we might want to improve this grammar to accept _subtracion_ and _paren
 - [X] Implement `Parser` class and its basic infrastructure for processing symbols.
 - [X] Implement the non-terminal production rules.
 - [X] Test the parsing process.
-- [ ] Improve parsing to generate, as a result, a list (`std::vector`) of tokens.
+- [X] Improve parsing to generate, as a result, a list (`std::vector`) of tokens.
+- [ ] Expand the grammar to handle a full [BARES](http://projetos.imd.ufrn.br/LP1_20162/bares.git) expression.
+
+# Authorship
+
+Program developed by Selan (<selan@dimap.ufrn.br>) and students from LP1, 2016.2
+
+&copy; DIMAp/UFRN 2016.
+

@@ -6,6 +6,9 @@
 
 std::vector<std::string> expressions =
 {
+    "32767 - 32768 + 3",
+    "5 + -32766",
+    "5 + -32769",
     "12 + 3",
     "-3+-5+-6",
     "12 + 3     -3 + -34 ",
@@ -59,6 +62,9 @@ void print_msg( const Parser::ParserResult & result, std::string str )
         case Parser::ParserResult::MISSING_CLOSING_PARENTHESIS:
             std::cout << ">>> Missing closing \")\" at column (" << result.at_col << ")!\n";
             break;
+        case Parser::ParserResult::INTEGER_OUT_OF_RANGE:
+            std::cout << ">>> Integer constant out of range beginning at column (" << result.at_col << ")!\n";
+            break;
         default:
             std::cout << ">>> Unhandled error found!\n";
             break;
@@ -85,6 +91,13 @@ int main()
             print_msg( result, expr );
         else
             std::cout << ">>> Expression SUCCESSFULLY parsed!\n";
+
+        // Recuperar a lista de tokens.
+        auto lista = my_parser.get_tokens();
+        std::cout << ">>> Tokens: { ";
+        std::copy( lista.begin(), lista.end(),
+                std::ostream_iterator< Token >(std::cout, " ") );
+        std::cout << "}\n";
     }
 
     std::cout << "\n>>> Normal exiting...\n";

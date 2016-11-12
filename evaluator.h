@@ -4,6 +4,7 @@
 #include <stack>     // stack
 #include <string>    // string
 #include <cassert>   // assert
+#include <iterator> // std::distance()
 #include <cmath>     // pow
 
 class Evaluator{
@@ -28,7 +29,7 @@ class Evaluator{
 			{/*empty*/}
 		};
 
-		EvaluatorResult evaluate( std::vector<Token> e_ );
+		EvaluatorResult evaluate( std::vector<Token> );
 		result_t get_result() const ;
 
 		/// Constutor default.
@@ -39,11 +40,13 @@ class Evaluator{
         Evaluator & operator=( const Evaluator & ) = delete; // Atribuição.
 
     private:
-    	std::string<Token> infix_expr;
-    	std::stack<Token> posfix_expr;
+    	std::vector<Token> infix_expr;
+    	std::stack<Token> postfix_expr;
+    	EvaluatorResult curr_status;
+    	std::vector::iterator curr_tk;
 
     	/// Converts a expression in infix notation to a corresponding profix representation.
-		std::stack<Token> infix_to_postfix( std::string );
+		void infix_to_postfix( std::vector< Token > );
 
 		/// Checks whether the first operator has higher precedence over the second one.
 		bool has_higher_precedence(Token , Token);
@@ -55,16 +58,16 @@ class Evaluator{
 		bool is_operator(Token);
 
 		/// Checks whether a token is a character is alphanumeric chanaracter (letter or numeric digit) or not. 
-		bool is_operand(Token);
+		bool is_operand( Token );
 
 		/// Checks whether the token is an opening scope symbol
-		bool is_opening_scope(Token);
+		bool is_opening_scope( Token );
 
 		/// Checks whether the token is a closing scope symbol
-		bool is_closing_scope(Token);
+		bool is_closing_scope( Token );
 
 		/// Returns the precedence of the operator.
-		result_t get_operator_precedence(Token);
+		int get_operator_precedence( Token );
 
 		/// Return the value of a token.
 		result_t char_2_int( Token );

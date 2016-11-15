@@ -78,6 +78,10 @@ Parser::terminal_symbol_t  Parser::lexer( char c_ ) const
         case '(':  return TS_L_PAREN;
         case '+':  return TS_PLUS;
         case '-':  return TS_MINUS;
+        case '*':  return TS_TIMES;
+        case '/':  return TS_DIVIDED;
+        case '%':  return TS_MOD;
+        case '^':  return TS_POWER;
         case ')':  return TS_R_PAREN;
         case ' ':  return TS_WS;
         case   9:  return TS_TAB;
@@ -194,7 +198,7 @@ bool Parser::expect( terminal_symbol_t s_ )
  *
  *  The production is:
  *  ```
- *  <expression> := <term>,{ "+",<term> };
+ *  <expr> := <term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term> };
  *  ```
  *  \sa parser(), term().
  */
@@ -231,9 +235,8 @@ void Parser::expression( void )
 
     // Se chegou aqui, quer dizer que o primeiro termo está ok.
     // devemos processar 0 ou mais <term>s
-    while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) ) and
-            curr_status.type == ParserResult::PARSER_OK )
-    {
+    while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) or expect( TS_TIMES ) or expect( TS_DIVIDED) or expect( TS_MOD ) or expect( TS_POWER ) ) 
+         and curr_status.type == ParserResult::PARSER_OK ){
         // ===============================================================================
         // TOKENIZAÇÃO:
         // Este código separa o token e o insere na lista de tokens
@@ -291,13 +294,19 @@ void Parser::expression( void )
  *  This method parses part of the input expression looking for <term>.
  *  The production is:
  *  ```
- *  <term> := <integer>;
+ *  <term> := "(",<expr>,")" | <integer>;
  *  ```
  *  \sa expression(), integer().
  */
 void Parser::term( void )
 {
-    integer();
+    if(expect( TS_L_PAREN )){
+        expression();
+        if( expect( TS_R_PAREN ) == false )
+            curr_status = ParserResult( ParserResult::MISSING_CLOSING_PARENTHESIS, std::distance( expr.begin(), curr_symb ) );
+    }
+    else
+        integer();
 }
 
 /*! \brief Parses a NTS <integer>.

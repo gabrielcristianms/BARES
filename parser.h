@@ -10,6 +10,7 @@
 
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.
+ *   First Version
  *
  *   <expr>            := <term>,{ ("+"|"-"),<term> };
  *   <term>            := <integer>;
@@ -17,7 +18,24 @@
  *   <natural_number>  := <digit_excl_zero>,{<digit>};
  *   <digit_excl_zero> := "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
  *   <digit>           := "0"| <digit_excl_zero>;
+ * 
+ *   
+ *   Full Grammar
+ *
+ *   <expr> := <term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term> };
+ *   <term> := "(",<expr>,")" | <integer>;
+ *   <integer> := 0 | ["-"],<natural_number>;
+ *   <natural_number> := <digit_excl_zero>,{<digit>};
+ *   <digit_excl_zero> := "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
+ *   <digit> := "0"| <digit_excl_zero>;
+ *
+ *
+ *
+ *
+ *
+ *
  */
+
 class Parser
 {
     public:
@@ -72,7 +90,11 @@ class Parser
             TS_L_PAREN=0,       //<! "("
             TS_R_PAREN,	        //<! ")"
             TS_PLUS,	        //<! "+"
-            TS_MINUS,	        //<! "-"
+            TS_MINUS,           //<! "-"
+            TS_TIMES,           //<! "*"
+            TS_DIVIDED,	        //<! "/"
+            TS_MOD,             //<! "%"
+            TS_POWER,           //<! "^"
             TS_ZERO,            //<! "0"
             TS_NON_ZERO_DIGIT,  //<! "1"->"9"
             TS_WS,              //<! white-space

@@ -268,7 +268,6 @@ void Parser::expression( void )
 
             term();
             for( auto e : token_list )
-                std::cout << e.value << " ";
 
             // ===============================================================================
             // TOKENIZAÇÃO:

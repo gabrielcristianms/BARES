@@ -20,12 +20,14 @@ Evaluator::right_association( Token tk_ ){
 
 bool 
 Evaluator::is_operator( Token tk_ ){
-	return ( tk_.value == "+" or tk_.value == "-" or tk_.value == "/" or tk_.value == "%" or tk_.value == "*" or tk_.value == "^");
+	//return ( tk_.value == "+" or tk_.value == "-" or tk_.value == "/" or tk_.value == "%" or tk_.value == "*" or tk_.value == "^");
+	return tk_.type == Token::OPERATOR;
 }
 
 bool 
 Evaluator::is_operand( Token tk_ ){
-	return ( tk_.value >= "0" and tk_.value <= "9" );
+	//return ( tk_.value >= "0" and tk_.value <= "9" );
+	return tk_.type == Token::OPERAND;
 }
 
 bool 
@@ -102,8 +104,22 @@ Evaluator::infix_to_postfix( void ){
 
 Evaluator::result_t
 Evaluator::tk_2_int( Token tk_ ){
-	char ch_ = tk_.value[0];
-	return ch_ - '0';
+	std::stringstream ss;
+	Evaluator::result_t result;
+
+	if( tk_.value[0] == '-' ){
+		std::string num;
+		for( auto it( tk_.value.begin()+1); it != tk_.value.end(); ++it ) 
+			num.push_back( *it );
+		ss << num;
+		ss >> result;
+		result *= -1;
+	}
+	else{
+		ss << tk_.value;
+		ss >> result;
+	}
+	return result;
 }
 
 Evaluator::result_t
@@ -139,7 +155,7 @@ Evaluator::evaluate_postfix( void ){
 			// Realiza a operação sobre os elementos.
 			auto result = apply_operation( op1, op2, tk );
 			
-			if( (final_result < -32.768) or (final_result > 32.767) ){
+			if( (final_result < -32768) or (final_result > 32767) ){
     			curr_status = EvaluatorResult( EvaluatorResult::RESULT_OVERFLOW );
     			return 42; // Carry a towel
     		}

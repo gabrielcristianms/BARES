@@ -38,7 +38,8 @@ std::vector<std::string> expressions =
     "2 + 4)",
     "2 ) + 4",
     "  (",
-    "       "
+    "       ",
+    " 1 + 2 + 50 + -1253"
 };
 
 void print_msg( const Parser::ParserResult & result, std::string str )
@@ -86,8 +87,8 @@ void print_msg_eval( const Evaluator::EvaluatorResult & result, std::string str 
             std::cout << ">>> Division by zero!\n";
             break;
         case Evaluator::EvaluatorResult::RESULT_OVERFLOW:
-            std::cout << ">>> Numeric overflow error!\n"; 
-
+            std::cout << ">>> Numeric overflow error!\n";
+            break;
         default:
             std::cout << ">>> Unhandled error found!\n";
             break;
@@ -124,11 +125,11 @@ int main()
                 std::ostream_iterator< Token >(std::cout, " ") );
         std::cout << "}\n";
 
-        //auto eval_result = my_evaluator.evaluate( lista );
+        auto eval_result = my_evaluator.evaluate( lista );
 
-        //if( eval_result.type != Evaluator::EvaluatorResult::EVALUATOR_OK )
-            //print_msg_eval( eval_result, expr );
-        //else std::cout << ">>> Expression SUCCESSFULLY evaluated, the result is" << my_evaluator.get_result() << "\n\n";
+        if( eval_result.type != Evaluator::EvaluatorResult::EVALUATOR_OK )
+            print_msg_eval( eval_result, expr );
+        else std::cout << ">>> Expression SUCCESSFULLY evaluated, the result is " << my_evaluator.get_result() << "\n\n";
     }
 
     std::cout << "\n>>> Normal exiting...\n";

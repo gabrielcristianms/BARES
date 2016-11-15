@@ -7,6 +7,7 @@
 #include <cassert>   // assert
 #include <iterator> // std::distance()
 #include <cmath>     // pow
+#include <sstream>	 // std::stringstream.
 #include "token.h"
 
 class Evaluator{

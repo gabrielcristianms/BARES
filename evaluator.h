@@ -3,16 +3,17 @@
 
 #include <stack>     // stack
 #include <string>    // string
+#include <vector>	// std::vector
 #include <cassert>   // assert
 #include <iterator> // std::distance()
 #include <cmath>     // pow
+#include "token.h"
 
 class Evaluator{
 	public:
-		typedef short int result_t;
+		typedef long int result_t;
 
 		struct EvaluatorResult{
-			typedef size_t size_type;
 
 			enum code_t{
 					EVALUATOR_OK = 0,
@@ -21,11 +22,9 @@ class Evaluator{
 			};
 
 			code_t type;
-			size_type at_col;
 
-			explicit EvaluatorResult( code_t type_ = EVALUATOR_OK, size_type col_ = 0u )
+			explicit EvaluatorResult( code_t type_ = EVALUATOR_OK )
 				: type{ type_ }
-				, at_col{ col_ }
 			{/*empty*/}
 		};
 
@@ -41,12 +40,12 @@ class Evaluator{
 
     private:
     	std::vector<Token> infix_expr;
-    	std::stack<Token> postfix_expr;
+    	std::vector<Token> postfix_expr;
     	EvaluatorResult curr_status;
-    	std::vector::iterator curr_tk;
+    	result_t final_result;
 
     	/// Converts a expression in infix notation to a corresponding profix representation.
-		void infix_to_postfix( std::vector< Token > );
+		void infix_to_postfix( void );
 
 		/// Checks whether the first operator has higher precedence over the second one.
 		bool has_higher_precedence(Token , Token);
@@ -70,9 +69,11 @@ class Evaluator{
 		int get_operator_precedence( Token );
 
 		/// Return the value of a token.
-		result_t char_2_int( Token );
+		result_t tk_2_int( Token );
 
 		/// This is where we calculate values and return them.
 		result_t apply_operation( result_t op1, result_t op2, Token ch );
+
+		result_t evaluate_postfix( void );
 };
 #endif

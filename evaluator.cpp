@@ -1,6 +1,5 @@
 #include "evaluator.h"
 
-
 bool
 Evaluator::has_higher_precedence( Token op1, Token op2 ){
 	bool result ( true );
@@ -16,35 +15,36 @@ Evaluator::has_higher_precedence( Token op1, Token op2 ){
 
 bool 
 Evaluator::right_association( Token tk_ ){
-	return ( tk_.value == '^' );
+	return ( tk_.value == "^" );
 }
 
 bool 
 Evaluator::is_operator( Token tk_ ){
-	return ( tk_.value == '+' or tk_.value == '-' or tk_.value == '/' or tk_.value == '%' or tk_.value == '*' or tk_.value == '^');
+	return ( tk_.value == "+" or tk_.value == "-" or tk_.value == "/" or tk_.value == "%" or tk_.value == "*" or tk_.value == "^");
 }
 
 bool 
 Evaluator::is_operand( Token tk_ ){
-	return ( tk_.value >= '0' and tk_.value <= '9' );
+	return ( tk_.value >= "0" and tk_.value <= "9" );
 }
 
 bool 
 Evaluator::is_opening_scope( Token tk_ ){
-	return tk_.value == '(';
+	return tk_.value == "(";
 }
 
 
 bool 
 Evaluator::is_closing_scope( Token tk_ ){
-	return tk_.value == ')';
+	return tk_.value == ")";
 }
 
 int 
 Evaluator::get_operator_precedence( Token tk_ ){
 	int weight = -1;
+	char ch_ = tk_.value[0];
 
-	switToken( tk_.value ){
+	switch ( ch_ ){
 		case '^' : weight = 3; break;
 		case '*' : 
 		case '/' :
@@ -57,12 +57,12 @@ Evaluator::get_operator_precedence( Token tk_ ){
 }
 
 void
-Evaluator::infix_to_postfix( std::vector< Token > infix ){
+Evaluator::infix_to_postfix( void ){
 	std::vector< Token > postfix;
 	std::stack< Token > S;
 
 	// Percorrer cada caractere da expressão
-	for( auto Token : infix ){
+	for( auto Token : infix_expr ){
 		// Abertura de escopo.
 		if( is_opening_scope( Token ) ){
 			S.push( Token );
@@ -97,27 +97,76 @@ Evaluator::infix_to_postfix( std::vector< Token > infix ){
 		postfix.push_back( S.top() );
 		S.pop();
 	}
-	return postfix;
+	postfix_expr = postfix;
 }
 
-result_t
-Evaluator::char_2_int( Token tk_ ){
-	return tk_.value - '0';
+Evaluator::result_t
+Evaluator::tk_2_int( Token tk_ ){
+	char ch_ = tk_.value[0];
+	return ch_ - '0';
 }
 
-result_t
+Evaluator::result_t
 Evaluator::apply_operation( result_t op1, result_t op2, Token tk_ ){
-	switch( tk_.value ){
+	char ch_ = tk_.value[0];
+	switch( ch_ ){
 		case '+': return op1 + op2;
 		case '-': return op1 - op2;
 		case '*': return op1 * op2;
 		case '/': if( op2 == 0 )
 					{
-						curr_status = Evaluator::DIVISION_BY_ZERO;
+						curr_status = EvaluatorResult(EvaluatorResult::DIVISION_BY_ZERO);
 				  	}
 				  return op1 / op2;
 		case '%': return op1 % op2;
 		case '^': return std::pow( op1, op2 );
 		default : assert(false);
 	}
+}
+
+Evaluator::result_t
+Evaluator::evaluate_postfix( void ){
+	std::stack<result_t> S;
+
+	for( auto tk : postfix_expr ){
+		if( is_operand( tk ) ){
+			S.push( tk_2_int( tk ) );
+		}
+		else if ( is_operator( tk ) ){
+			auto op2 = S.top(); S.pop();
+			auto op1 = S.top(); S.pop();
+
+			// Realiza a operação sobre os elementos.
+			auto result = apply_operation( op1, op2, tk );
+			
+			if( (final_result < -32.768) or (final_result > 32.767) ){
+    			curr_status = EvaluatorResult( EvaluatorResult::RESULT_OVERFLOW );
+    			return 42; // Carry a towel
+    		}
+			S.push( result );
+		}
+		else{
+			assert( false );
+		}
+	}
+	// A pilha não pode estar vazia, pois no topo deve estar o resultado.
+	assert( not S.empty() );
+	return S.top();
+}
+
+Evaluator::EvaluatorResult
+Evaluator::evaluate( std::vector<Token> e_ ){
+	infix_expr = e_; //Guarda a lista de tokens
+	curr_status = EvaluatorResult( EvaluatorResult::EVALUATOR_OK ); // "Resetar" a msg de status p/ OK.
+    final_result = 42; // Valor padrão.
+
+    infix_to_postfix();
+    final_result = evaluate_postfix();
+
+    return curr_status;
+}
+
+Evaluator::result_t
+Evaluator::get_result(void) const{
+	return final_result;
 }

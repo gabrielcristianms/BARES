@@ -29,7 +29,7 @@ Parser::parse( std::string e_ )
     {
         // Se chegou aqui, então estamos esperando uma expressão bem formada.
         expression(); // Tenta aceitar uma expressão bem formada.
-
+        
         // Se depois da expressão ter sido bem avaliada (sem erros), ainda existir algum
         // caractere (que não seja ws), então existem símbolo(s) estranho(s)...
         if ( curr_status.type == ParserResult::PARSER_OK )
@@ -207,6 +207,7 @@ void Parser::expression( void )
     auto begin_token = curr_symb;
 
     term(); // Procura aceitar um <term> dentro da expressõ.
+
     // Verificar se já não tem erro encontrado, ou seja, o <term> anterior foi mal-formado.
     if ( curr_status.type != ParserResult::PARSER_OK )
         return; // Não adiantar continuar processando, melhor voltar...
@@ -219,15 +220,14 @@ void Parser::expression( void )
     std::string token_value;
     std::copy( begin_token, curr_symb, std::back_inserter( token_value ) );
     // Testar se o valor está dentro dos limites aceitáveis de um inteiro curto.
+
     if( outside_range( token_value ) )
     {
         // Gerar error de parser correspondente.
         curr_status = ParserResult( ParserResult::INTEGER_OUT_OF_RANGE,
                 std::distance( expr.begin(), begin_token ) );
     }
-    else
-    {
-        // Token Ok. Inserir o token na lista.
+    else{
         token_list.emplace_back( Token( token_value, Token::OPERAND ) );
     }
     // ===============================================================================
@@ -235,8 +235,9 @@ void Parser::expression( void )
 
     // Se chegou aqui, quer dizer que o primeiro termo está ok.
     // devemos processar 0 ou mais <term>s
-    while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) or expect( TS_TIMES ) or expect( TS_DIVIDED) or expect( TS_MOD ) or expect( TS_POWER ) ) 
-         and curr_status.type == ParserResult::PARSER_OK ){
+    while ( ( expect( TS_PLUS ) or expect( TS_MINUS ) or expect( TS_TIMES ) or expect( TS_DIVIDED) or expect( TS_MOD ) or expect( TS_POWER )
+              /*or expect( TS_L_PAREN ) or expect( TS_R_PAREN )*/ ) 
+              and curr_status.type == ParserResult::PARSER_OK ){
         // ===============================================================================
         // TOKENIZAÇÃO:
         // Este código separa o token e o insere na lista de tokens
@@ -264,7 +265,10 @@ void Parser::expression( void )
             // Iniciando um novo token.
             begin_token = curr_symb;
             // Situação normal, esperamos aceitar um novo termo.
+
             term();
+            for( auto e : token_list )
+                std::cout << e.value << " ";
 
             // ===============================================================================
             // TOKENIZAÇÃO:
@@ -288,6 +292,10 @@ void Parser::expression( void )
         }
     }
 }
+/*
+    <expr> := <term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term> };
+    <term> := "(",<expr>,")" | <integer>;
+*/
 
 /*! \brief Parses a NTS <term>.
  *
@@ -299,14 +307,8 @@ void Parser::expression( void )
  *  \sa expression(), integer().
  */
 void Parser::term( void )
-{
-    if(expect( TS_L_PAREN )){
-        expression();
-        if( expect( TS_R_PAREN ) == false )
-            curr_status = ParserResult( ParserResult::MISSING_CLOSING_PARENTHESIS, std::distance( expr.begin(), curr_symb ) );
-    }
-    else
-        integer();
+{   
+    integer();    
 }
 
 /*! \brief Parses a NTS <integer>.

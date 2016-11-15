@@ -8,7 +8,7 @@
 
 std::vector<std::string> expressions =
 {
-    "32767 - 32768 + 3",
+    /*"32767 - 32768 + 3",
     "5 + -32766",
     "5 + -32769",
     "12 + 3",
@@ -38,8 +38,8 @@ std::vector<std::string> expressions =
     "2 + 4)",
     "2 ) + 4",
     "  (",
-    "       ",
-    " 1 + 2 + 50 + -1253"
+    "       ",*/
+    "   5 * 10 + 10 ^ 5 "
 };
 
 void print_msg( const Parser::ParserResult & result, std::string str )

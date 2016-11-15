@@ -144,6 +144,10 @@ Evaluator::result_t
 Evaluator::evaluate_postfix( void ){
 	std::stack<result_t> S;
 
+	for( auto e : postfix_expr )
+		std::cout << e.value << " ";
+	std::cout << "\n\n"; 
+
 	for( auto tk : postfix_expr ){
 		if( is_operand( tk ) ){
 			S.push( tk_2_int( tk ) );

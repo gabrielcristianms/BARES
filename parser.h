@@ -29,11 +29,7 @@
  *   <digit_excl_zero> := "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
  *   <digit> := "0"| <digit_excl_zero>;
  *
- *
- *
- *
- *
- *
+ *   This version is using the full grammar without treating parenthesis.
  */
 
 class Parser

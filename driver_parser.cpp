@@ -42,7 +42,7 @@
     "   5 * 10 + 10 ^ 5 "
 };
 */
-void print_msg( const Parser::ParserResult & result, std::string str )
+void print_msg( const Parser::ParserResult & result)
 {    
     // Have we got a parsing error?
    
@@ -72,7 +72,7 @@ void print_msg( const Parser::ParserResult & result, std::string str )
     }
 }
 
-void print_msg_eval( const Evaluator::EvaluatorResult & result, std::string str )
+void print_msg_eval( const Evaluator::EvaluatorResult & result )
 {
     
     // Have we got a parsing error?
@@ -104,16 +104,18 @@ int main()
         // Preparar cabeçalho da saida.
         // Se deu pau, imprimir a mensagem adequada.
         if ( result.type != Parser::ParserResult::PARSER_OK ){
-            print_msg( result, expr );
+            print_msg( result );
             continue;
         }
        // Recuperar a lista de tokens.
         auto lista = my_parser.get_tokens();
         
         auto eval_result = my_evaluator.evaluate( lista );
-
-        if( eval_result.type != Evaluator::EvaluatorResult::EVALUATOR_OK )
-            print_msg_eval( eval_result, expr );
+        
+        if( eval_result.type != Evaluator::EvaluatorResult::EVALUATOR_OK ){
+            print_msg_eval( eval_result );
+            continue;
+        }
         else std::cout << my_evaluator.get_result() << "\n";
     }
     return EXIT_SUCCESS;

@@ -133,6 +133,7 @@ Evaluator::apply_operation( result_t op1, result_t op2, Token tk_ ){
 					{
 						std::cout << "Tou aqui?\n";
 						curr_status = EvaluatorResult(EvaluatorResult::DIVISION_BY_ZERO);
+						return 42; // you'll certainly need a towel now
 				  	}
 				  return op1 / op2;
 		case '%': return op1 % op2;
@@ -156,7 +157,7 @@ Evaluator::evaluate_postfix( void ){
 			// Realiza a operação sobre os elementos.
 			auto result = apply_operation( op1, op2, tk );
 			
-			if( (final_result < -32768) or (final_result > 32767) ){
+			if( (result < -32768) or (result > 32767) ){
     			curr_status = EvaluatorResult( EvaluatorResult::RESULT_OVERFLOW );
     			return 42; // Carry a towel
     		}
@@ -175,7 +176,6 @@ Evaluator::EvaluatorResult
 Evaluator::evaluate( std::vector<Token> e_ ){
 	infix_expr = e_; //Guarda a lista de tokens
 	curr_status = EvaluatorResult( EvaluatorResult::EVALUATOR_OK ); // "Resetar" a msg de status p/ OK.
-    final_result = 42; // Valor padrão.
 
     infix_to_postfix();
     final_result = evaluate_postfix();

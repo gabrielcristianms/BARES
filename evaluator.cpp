@@ -131,6 +131,7 @@ Evaluator::apply_operation( result_t op1, result_t op2, Token tk_ ){
 		case '*': return op1 * op2;
 		case '/': if( op2 == 0 )
 					{
+						std::cout << "Tou aqui?\n";
 						curr_status = EvaluatorResult(EvaluatorResult::DIVISION_BY_ZERO);
 				  	}
 				  return op1 / op2;
@@ -143,10 +144,6 @@ Evaluator::apply_operation( result_t op1, result_t op2, Token tk_ ){
 Evaluator::result_t
 Evaluator::evaluate_postfix( void ){
 	std::stack<result_t> S;
-
-	for( auto e : postfix_expr )
-		std::cout << e.value << " ";
-	std::cout << "\n\n"; 
 
 	for( auto tk : postfix_expr ){
 		if( is_operand( tk ) ){

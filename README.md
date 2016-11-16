@@ -8,4 +8,6 @@ Para compilar execute
 	g++ -Wall -std=c++11 token.h parser.h parser.cpp evaluator.h evaluator.cpp driver_parser.cpp -o bares
 
 Na hora de executar o binário, faça-o da seguinte maneira
-	./bares <arquivoEntrada.txt >ArquivoSaida.txt
+	./bares <ArquivoEntrada.txt >ArquivoSaida.txt
+
+Link do repositório: http://projetos.imd.ufrn.br/Vash/BARES

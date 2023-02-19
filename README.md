@@ -7,5 +7,3 @@ Para compilar execute
 
 Na hora de executar o binário, faça-o da seguinte maneira
 	./bares <ArquivoEntrada.txt >ArquivoSaida.txt
-
-Link do repositório: http://projetos.imd.ufrn.br/Vash/BARES

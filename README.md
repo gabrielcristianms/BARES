@@ -1,5 +1,3 @@
-# Aluno Gabriel Cristian Melo da Silva
-
 # BARES
 Esta versão do BARES não está com a gramática totalmente completa. No caso, ela não é capaz de tratar parêntesis, mas realiza cálculos com todas as operações suportadas e faz o tratamento de erro sintático e avaliativo. Para leitura e impressão dos resultados foi utilizado std::cin e std::cout, o que resulta num detalhe um pouco diferente na hora da execução do programa.
 Este projeto não está com a divisão em pastas. Comentários no formato doxygen foram feitos, mas não sou capaz de gerar os arquivos na minha máquina pessoal.
